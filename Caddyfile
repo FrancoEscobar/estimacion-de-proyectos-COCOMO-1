@@ -1,4 +1,13 @@
 :80
-root * /path/to/project
+
+# Raíz de tu proyecto
+root * /var/www/html
+
+# Ejecutar PHP usando FrankenPHP
 php_fastcgi index.php
+
+# Servir archivos estáticos (CSS, JS, imágenes)
 file_server
+
+# Opcional: mostrar errores de PHP en desarrollo
+encode zstd gzip
