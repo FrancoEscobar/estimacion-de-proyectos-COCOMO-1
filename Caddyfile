@@ -1,6 +1,6 @@
 :80
 
-# Raíz de tu proyecto
+# Raíz de tu proyecto (donde está index.php)
 root * /var/www/html
 
 # Ejecutar PHP usando FrankenPHP
@@ -9,5 +9,13 @@ php_fastcgi index.php
 # Servir archivos estáticos (CSS, JS, imágenes)
 file_server
 
-# Opcional: mostrar errores de PHP en desarrollo
+# Comprimir las respuestas para mayor rendimiento
 encode zstd gzip
+
+# Opcional: mostrar errores de PHP en desarrollo
+@phpErrors {
+    path *.php
+}
+handle @phpErrors {
+    php_fastcgi index.php
+}
