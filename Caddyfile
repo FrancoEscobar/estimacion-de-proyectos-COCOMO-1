@@ -1,0 +1,4 @@
+:80
+root * /path/to/project
+php_fastcgi index.php
+file_server
