@@ -52,8 +52,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar'])) {
                     // Obtener multiplicador (si es null, se usa nominal)
                     $indice = array_search($v, VALORACIONES);
                     $valor = $valores[$indice] ?? $valores[2];
+
+                    // Seleccionado por defecto si es "Nominal"
+                    $selected = ($v === "Nominal") ? 'selected' : '';
                 ?>
-                    <option value="<?= $v ?>"><?= $v ?> (<?= $valor ?>)</option>
+                    <option value="<?= $v ?>" <?= $selected ?>><?= $v ?> (<?= $valor ?>)</option>
                 <?php endforeach; ?>
             </select>
         <?php endforeach; ?>
