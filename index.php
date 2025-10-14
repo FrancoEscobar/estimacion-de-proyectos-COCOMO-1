@@ -49,11 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar'])) {
                 <?php foreach (VALORACIONES as $v):
                     if (in_array($factor, $excluir_muy_bajo) && $v === "Muy bajo") continue;
 
-                    // Obtener multiplicador (si es null, se usa nominal)
                     $indice = array_search($v, VALORACIONES);
                     $valor = $valores[$indice] ?? $valores[2];
-
-                    // Seleccionado por defecto si es "Nominal"
                     $selected = ($v === "Nominal") ? 'selected' : '';
                 ?>
                     <option value="<?= $v ?>" <?= $selected ?>><?= $v ?> (<?= $valor ?>)</option>
@@ -63,6 +60,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar'])) {
 
         <button type="submit" name="agregar">Agregar Proyecto</button>
     </form>
+
+    <!-- Tabla de factores seleccionados -->
+    <?php if (!empty($_POST['factores'])): ?>
+        <h3>Factores Seleccionados para este Proyecto</h3>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Factor</th>
+                    <th>Valoración</th>
+                    <th>Multiplicador</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($_POST['factores'] as $factor => $valoracion):
+                    $indice = array_search($valoracion, VALORACIONES);
+                    $multiplicador = FACTORES_DE_COSTO[$factor][$indice] ?? FACTORES_DE_COSTO[$factor][2];
+                ?>
+                    <tr>
+                        <td><?= $factor ?></td>
+                        <td><?= $valoracion ?></td>
+                        <td><?= $multiplicador ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endif; ?>
 
     <h2>Comparativa de Proyectos</h2>
     <?php if(!empty($_SESSION['proyectos'])): ?>
