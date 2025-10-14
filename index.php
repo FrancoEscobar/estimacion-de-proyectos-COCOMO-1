@@ -7,6 +7,24 @@ if (!isset($_SESSION['proyectos'])) {
     $_SESSION['proyectos'] = [];
 }
 
+// Descripciones de los factores
+$DESCRIPCIONES = [
+    "RELY" => "Fiabilidad requerida",
+    "DATA" => "Tamaño de la base de datos",
+    "CPLX" => "Complejidad del producto",
+    "TIME" => "Restricciones de tiempo",
+    "STOR" => "Restricciones de almacenamiento",
+    "VIRT" => "Capacidades virtuales del equipo",
+    "TURN" => "Tiempo de respuesta requerido",
+    "ACAP" => "Capacidad del analista",
+    "PCAP" => "Capacidad del programador",
+    "AEXP" => "Experiencia en aplicación",
+    "LTEX" => "Experiencia en herramientas",
+    "MODP" => "Prácticas de desarrollo",
+    "TOOL" => "Herramientas de software",
+    "SCED" => "Restricciones de calendario"
+];
+
 // Procesar formulario
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar'])) {
     $resultado = estimar_costo_proyecto($_POST);
@@ -44,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar'])) {
         $excluir_muy_bajo = ["DATA", "TIME", "STOR", "TURN"];
 
         foreach (FACTORES_DE_COSTO as $factor => $valores): ?>
-            <label><?= $factor ?>:</label>
+            <label><?= $factor ?> <?= $DESCRIPCIONES[$factor] ?? '' ?>:</label>
             <select name="factores[<?= $factor ?>]" required>
                 <?php foreach (VALORACIONES as $v):
                     if (in_array($factor, $excluir_muy_bajo) && $v === "Muy bajo") continue;
@@ -68,6 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar'])) {
             <thead>
                 <tr>
                     <th>Factor</th>
+                    <th>Descripción</th>
                     <th>Valoración</th>
                     <th>Multiplicador</th>
                 </tr>
@@ -79,6 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar'])) {
                 ?>
                     <tr>
                         <td><?= $factor ?></td>
+                        <td><?= $DESCRIPCIONES[$factor] ?? '' ?></td>
                         <td><?= $valoracion ?></td>
                         <td><?= $multiplicador ?></td>
                     </tr>
@@ -122,3 +142,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar'])) {
 </div>
 </body>
 </html>
+
