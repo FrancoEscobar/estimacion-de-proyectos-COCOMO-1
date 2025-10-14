@@ -22,7 +22,8 @@ $DESCRIPCIONES = [
     "LTEX" => "Experiencia en herramientas",
     "MODP" => "Prácticas de desarrollo",
     "TOOL" => "Herramientas de software",
-    "SCED" => "Restricciones de calendario"
+    "SCED" => "Restricciones de calendario",
+    "VEXP" => "Experiencia con la plataforma"
 ];
 
 // Procesar formulario
