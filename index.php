@@ -56,7 +56,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar'])) {
     <h1>Estimación de Proyectos COCOMO I</h1>
 
     <?php if ($mensaje_error): ?>
-        <p style="color: red; font-weight: bold;"><?= $mensaje_error ?></p>
+        <div class="alert-error">
+            <?= $mensaje_error ?>
+        </div>
     <?php endif; ?>
 
     <form method="post">
