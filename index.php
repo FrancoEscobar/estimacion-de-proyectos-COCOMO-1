@@ -27,21 +27,29 @@ $DESCRIPCIONES = [
 ];
 
 // Procesar formulario
-$mensaje_error = "";
+$errores = [];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar'])) {
     $KLOC = trim($_POST['KLOC']);
     $salario = trim($_POST['salario']);
 
     if ($KLOC === "" || $salario === "" || empty($_POST['modo']) || empty($_POST['factores'])) {
-        $mensaje_error = "⚠️ Por favor, completa todos los campos antes de continuar.";
-    } elseif (!is_numeric($KLOC) || !is_numeric($salario)) {
-        $mensaje_error = "⚠️ Los campos numéricos deben contener valores válidos.";
+        $errores[] = "⚠️ Por favor, completa todos los campos antes de continuar.";
+    }
+
+    if (!is_numeric($KLOC)) {
+        $errores[] = "⚠️ El campo KLOC debe ser un número válido.";
     } elseif ($KLOC <= 0) {
-        $mensaje_error = "⚠️ El tamaño del proyecto (KLOC) debe ser mayor a 0.";
+        $errores[] = "⚠️ El tamaño del proyecto (KLOC) debe ser mayor a 0.";
+    }
+
+    if (!is_numeric($salario)) {
+        $errores[] = "⚠️ El campo salario debe ser un número válido.";
     } elseif ($salario < 0) {
-        $mensaje_error = "⚠️ El salario no puede ser negativo.";
-    } else {
+        $errores[] = "⚠️ El salario no puede ser negativo.";
+    }
+
+    if (empty($errores)) {
         $resultado = estimar_costo_proyecto($_POST);
         $_SESSION['proyectos'][] = $resultado;
     }
@@ -69,9 +77,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar'])) {
 <div class="container">
     <h1>Estimación de Proyectos COCOMO I</h1>
 
-    <?php if ($mensaje_error): ?>
+    <?php if (!empty($errores)): ?>
         <div class="alert-error">
-            <?= $mensaje_error ?>
+            <ul>
+                <?php foreach ($errores as $err): ?>
+                    <li><?= $err ?></li>
+                <?php endforeach; ?>
+            </ul>
         </div>
     <?php endif; ?>
 
