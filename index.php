@@ -27,9 +27,21 @@ $DESCRIPCIONES = [
 ];
 
 // Procesar formulario
+$mensaje_error = "";
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar'])) {
-    $resultado = estimar_costo_proyecto($_POST);
-    $_SESSION['proyectos'][] = $resultado;
+    $KLOC = $_POST['KLOC'];
+    $salario = $_POST['salario'];
+
+    // Validaciones
+    if ($KLOC <= 0) {
+        $mensaje_error = "Error: El tamaño del proyecto (KLOC) debe ser mayor a 0.";
+    } elseif ($salario < 0) {
+        $mensaje_error = "Error: El salario no puede ser negativo.";
+    } else {
+        $resultado = estimar_costo_proyecto($_POST);
+        $_SESSION['proyectos'][] = $resultado;
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -43,18 +55,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar'])) {
 <div class="container">
     <h1>Estimación de Proyectos COCOMO I</h1>
 
+    <?php if ($mensaje_error): ?>
+        <p style="color: red; font-weight: bold;"><?= $mensaje_error ?></p>
+    <?php endif; ?>
+
     <form method="post">
         <label>Tamaño del proyecto (KLOC):</label>
-        <input type="number" step="0.01" name="KLOC" required>
+        <input type="number" step="0.01" name="KLOC" required min="0" value="<?= $_POST['KLOC'] ?? '' ?>">
 
         <label>Salario mensual del equipo:</label>
-        <input type="number" step="0.01" name="salario" required>
+        <input type="number" step="0.01" name="salario" required min="0" value="<?= $_POST['salario'] ?? '' ?>">
 
         <label>Modo de desarrollo:</label>
         <select name="modo" required>
-            <option value="organico">Orgánico</option>
-            <option value="semiacoplado">Semiacoplado</option>
-            <option value="empotrado">Empotrado</option>
+            <option value="organico" <?= (($_POST['modo'] ?? '') == 'organico') ? 'selected' : '' ?>>Orgánico</option>
+            <option value="semiacoplado" <?= (($_POST['modo'] ?? '') == 'semiacoplado') ? 'selected' : '' ?>>Semiacoplado</option>
+            <option value="empotrado" <?= (($_POST['modo'] ?? '') == 'empotrado') ? 'selected' : '' ?>>Empotrado</option>
         </select>
 
         <h3>Factores de costo</h3>
@@ -70,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar'])) {
 
                     $indice = array_search($v, VALORACIONES);
                     $valor = $valores[$indice] ?? $valores[2];
-                    $selected = ($v === "Nominal") ? 'selected' : '';
+                    $selected = (($_POST['factores'][$factor] ?? '') == $v) ? 'selected' : (($v === "Nominal") ? 'selected' : '');
                 ?>
                     <option value="<?= $v ?>" <?= $selected ?>><?= $v ?> (<?= $valor ?>)</option>
                 <?php endforeach; ?>
@@ -81,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar'])) {
     </form>
 
     <!-- Tabla de factores seleccionados -->
-    <?php if (!empty($_POST['factores'])): ?>
+    <?php if (!empty($_POST['factores']) && !$mensaje_error): ?>
         <h3>Factores Seleccionados para este Proyecto</h3>
         <table border="1">
             <thead>
