@@ -64,7 +64,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar'])) {
 
 // Recuperar factores para mostrar la tabla
 $factores_a_mostrar = $_SESSION['ultimo_factores'] ?? null;
-unset($_SESSION['ultimo_factores']);
 ?>
 <!DOCTYPE html>
 <html lang="es">
