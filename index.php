@@ -30,14 +30,17 @@ $DESCRIPCIONES = [
 $mensaje_error = "";
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar'])) {
-    $KLOC = $_POST['KLOC'];
-    $salario = $_POST['salario'];
+    $KLOC = trim($_POST['KLOC']);
+    $salario = trim($_POST['salario']);
 
-    // Validaciones
-    if ($KLOC <= 0) {
-        $mensaje_error = "Error: El tamaño del proyecto (KLOC) debe ser mayor a 0.";
+    if ($KLOC === "" || $salario === "" || empty($_POST['modo']) || empty($_POST['factores'])) {
+        $mensaje_error = "⚠️ Por favor, completa todos los campos antes de continuar.";
+    } elseif (!is_numeric($KLOC) || !is_numeric($salario)) {
+        $mensaje_error = "⚠️ Los campos numéricos deben contener valores válidos.";
+    } elseif ($KLOC <= 0) {
+        $mensaje_error = "⚠️ El tamaño del proyecto (KLOC) debe ser mayor a 0.";
     } elseif ($salario < 0) {
-        $mensaje_error = "Error: El salario no puede ser negativo.";
+        $mensaje_error = "⚠️ El salario no puede ser negativo.";
     } else {
         $resultado = estimar_costo_proyecto($_POST);
         $_SESSION['proyectos'][] = $resultado;
@@ -50,6 +53,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar'])) {
     <meta charset="UTF-8">
     <title>COCOMO I - Estimación de Proyectos</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .alert-error {
+            background-color: #f8d7da;
+            color: #842029;
+            border: 1px solid #f5c2c7;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
@@ -63,10 +77,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar'])) {
 
     <form method="post">
         <label>Tamaño del proyecto (KLOC):</label>
-        <input type="number" step="0.01" name="KLOC" required min="0" value="<?= $_POST['KLOC'] ?? '' ?>">
+        <input type="number" step="0.01" name="KLOC" required value="<?= $_POST['KLOC'] ?? '' ?>">
 
         <label>Salario mensual del equipo:</label>
-        <input type="number" step="0.01" name="salario" required min="0" value="<?= $_POST['salario'] ?? '' ?>">
+        <input type="number" step="0.01" name="salario" required value="<?= $_POST['salario'] ?? '' ?>">
 
         <label>Modo de desarrollo:</label>
         <select name="modo" required>
@@ -77,15 +91,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar'])) {
 
         <h3>Factores de costo</h3>
         <?php
-        // Factores que no permiten "Muy bajo"
         $excluir_muy_bajo = ["DATA", "TIME", "STOR", "TURN"];
-
         foreach (FACTORES_DE_COSTO as $factor => $valores): ?>
             <label><?= $factor ?> <?= $DESCRIPCIONES[$factor] ?? '' ?>:</label>
             <select name="factores[<?= $factor ?>]" required>
                 <?php foreach (VALORACIONES as $v):
                     if (in_array($factor, $excluir_muy_bajo) && $v === "Muy bajo") continue;
-
                     $indice = array_search($v, VALORACIONES);
                     $valor = $valores[$indice] ?? $valores[2];
                     $selected = (($_POST['factores'][$factor] ?? '') == $v) ? 'selected' : (($v === "Nominal") ? 'selected' : '');
@@ -98,7 +109,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar'])) {
         <button type="submit" name="agregar">Agregar Proyecto</button>
     </form>
 
-    <!-- Tabla de factores seleccionados -->
     <?php if (!empty($_POST['factores']) && !$mensaje_error): ?>
         <h3>Factores Seleccionados para este Proyecto</h3>
         <table border="1">
