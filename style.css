@@ -78,3 +78,14 @@ th {
     border-radius: 6px;
     text-decoration: none;
 }
+
+.alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    padding: 12px 15px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+}
