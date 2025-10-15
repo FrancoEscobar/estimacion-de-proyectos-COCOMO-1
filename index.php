@@ -26,9 +26,9 @@ $DESCRIPCIONES = [
     "VEXP" => "Experiencia con la plataforma"
 ];
 
-// Procesar formulario
 $errores = [];
 
+// Procesar formulario
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar'])) {
     $KLOC = trim($_POST['KLOC']);
     $salario = trim($_POST['salario']);
@@ -53,10 +53,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar'])) {
         $resultado = estimar_costo_proyecto($_POST);
         $_SESSION['proyectos'][] = $resultado;
 
+        // Guardar los factores seleccionados temporalmente
+        $_SESSION['ultimo_factores'] = $_POST['factores'];
+
+        // Evitar reenvío del formulario
         header("Location: " . $_SERVER['PHP_SELF']);
-        exit(); 
+        exit();
     }
 }
+
+// Recuperar factores para mostrar la tabla
+$factores_a_mostrar = $_SESSION['ultimo_factores'] ?? null;
+unset($_SESSION['ultimo_factores']);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -74,6 +82,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar'])) {
             margin-bottom: 15px;
             font-weight: bold;
         }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        table, th, td { border: 1px solid #333; }
+        th, td { padding: 8px; text-align: center; }
+        .btn-reset { display:inline-block; padding: 8px 15px; background:#f44336; color:#fff; text-decoration:none; border-radius:5px; }
     </style>
 </head>
 <body>
@@ -124,9 +140,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar'])) {
         <button type="submit" name="agregar">Agregar Proyecto</button>
     </form>
 
-    <?php if (!empty($_POST['factores']) && !$mensaje_error): ?>
+    <?php if (!empty($factores_a_mostrar)): ?>
         <h3>Factores Seleccionados para este Proyecto</h3>
-        <table border="1">
+        <table>
             <thead>
                 <tr>
                     <th>Factor</th>
@@ -136,7 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar'])) {
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($_POST['factores'] as $factor => $valoracion):
+                <?php foreach ($factores_a_mostrar as $factor => $valoracion):
                     $indice = array_search($valoracion, VALORACIONES);
                     $multiplicador = FACTORES_DE_COSTO[$factor][$indice] ?? FACTORES_DE_COSTO[$factor][2];
                 ?>
