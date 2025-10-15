@@ -52,6 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar'])) {
     if (empty($errores)) {
         $resultado = estimar_costo_proyecto($_POST);
         $_SESSION['proyectos'][] = $resultado;
+
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit(); 
     }
 }
 ?>
